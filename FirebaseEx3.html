@@ -1,0 +1,109 @@
+<!doctype html>
+
+<head>
+<title>Learn Firebase Storage Quickly</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.0/semantic.min.css" />
+</head>
+<body>
+
+  <br>
+
+  <div class="ui two column middle aligned center aligned grid">
+    <div class="column">
+      <form class="ui large form">
+
+        <div class="ui stacked secondary segment">
+          <div class="field">
+            <div class="ui left icon input large">
+              <i class="user icon"></i>
+              <input type="text" placeholder="E-mail address" id="email" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui left icon input large">
+              <i class="lock icon"></i>
+              <input type="text" placeholder="Password" id="pword" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="ui left icon input large">
+              <i class="image icon"></i>
+              <input type="file" id="fileUploader" />
+            </div>
+          </div>
+          <div class=" ui fluid large teal submit button" onclick="signUpUser()">Sign Up</div>
+        </div>
+
+        <div class="ui large image">
+          <img id="img">
+        </div>
+
+
+      </form>
+    </div>
+  </div>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/7.9.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.9.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.9.0/firebase-storage.js"></script>
+<script>
+// Firebase Config
+var firebaseConfig = {
+	apiKey: "AIzaSyB0dWJaq-r1Zfh3NmsiL9bTU2uzHueICNI",
+	authDomain: "webex-cb569.firebaseapp.com",
+	databaseURL: "https://webex-cb569-default-rtdb.firebaseio.com",
+	projectId: "webex-cb569",
+	storageBucket: "webex-cb569.appspot.com",
+	messagingSenderId: "613401733335",
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+
+
+
+
+
+
+// -------------------------------------
+// Upload Profile Picture With Authentication
+// -------------------------------------
+let file = {};
+const email = document.getElementById('email');
+const pword = document.getElementById('pword')
+document.getElementById('fileUploader').addEventListener('change', function (e) {
+  file = e.target.files[0];
+  alert(file.name);
+})
+
+
+// Signup User
+function signUpUser() {
+  firebase.auth().createUserWithEmailAndPassword(email.value, pword.value).then(auth => {
+
+    // Upload A Profile Image to the Cloud Storage
+    firebase.storage().ref("users").child(auth.user.uid + "/profile.jpg").put(file);
+    // firebase.storage().ref("users").child(auth.user.uid+ "/ "+file.name).put(file);
+
+  }).catch(error => {
+    console.log(error.message)
+  })
+}
+
+
+
+// read image to show image
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    firebase.storage().ref("users").child(user.uid + "/profile.jpg").getDownloadURL().then(imgUrl => {
+        img.src = imgUrl;
+    });	
+  }
+})
+</script>
+</body>
+</html>
